@@ -1,25 +1,24 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from 'react'
+import GanttChart from './Gantt1';
+import LoginPage from './Login';
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import Register from './Login';
 
-function App() {
+const App = () => {
+
+  const [one, setOne] = useState(false)
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <Router>
+        <Routes>
+          <Route path="/" element={<Register />} />
+          <Route path="/gantt" element={<GanttChart />} />
+        </Routes>
+      </Router>
     </div>
   );
 }
 
-export default App;
+export default App
+
+
