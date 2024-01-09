@@ -11,12 +11,18 @@ import { Button } from 'antd';
 import AddTaskDialogue from './componenets/AddTaskDialog/AddTaskDialog.js';
 import axios from 'axios';
 import TaskModal from './componenets/DetailsModal.js';
+import { useTasksContext } from './hooks/useTasksContext.js';
+import { useAuthContext } from './hooks/useAuthContext.js';
 
 function GanttChart() {
+
+  const {tasks ,setTasks} = useTasksContext();
   const [fetchedTask, setFetchedTask] = useState([]);
-  const [tasks, setTasks] = useState([]);
+  // const [tasks, setTasks] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
+
+  const { user } = useAuthContext();
 
   const openModal = (task) => {
     setSelectedTask(task);
@@ -111,7 +117,9 @@ function GanttChart() {
 
   function getTasks() {
     axios
-      .get('http://localhost:5000/api/tasks')
+      .get('http://localhost:5000/api/tasks', {
+        headers: { Authorization: `Bearer ${user.token}` },
+      })
       .then((res) => {
         console.log(res.data);
         setTasks(formatDate(res.data));
@@ -240,9 +248,11 @@ function GanttChart() {
   }
 
   useEffect(() => {
-    getTasks();
+    if (user) {
+      getTasks();
+    }
     console.log('Hii');
-  }, []);
+  }, [user]);
 
   const [view, setView] = useState(ViewMode.Day);
 
@@ -278,7 +288,9 @@ function GanttChart() {
 
   function deleteTask(task) {
     axios
-      .delete(`http://localhost:5000/api/tasks/${task}`)
+      .delete(`http://localhost:5000/api/tasks/${task}`,{
+        headers: { Authorization: `Bearer ${user.token}` },
+      })
       .then((res) => {
         console.log(`Task with ID ${task} deleted successfully.`);
       })
@@ -288,7 +300,11 @@ function GanttChart() {
   }
 
   const handleTaskDelete = (task) => {
-    const hasDependencies = task.dependencies && task.dependencies.length > 0;
+    if (!user) {
+      return;
+    }
+    else{
+      const hasDependencies = task.dependencies && task.dependencies.length > 0;
     console.log(task.id);
 
     if (hasDependencies) {
@@ -306,6 +322,8 @@ function GanttChart() {
       setTasks(filteredTask);
     }
     return conf;
+    }
+    
   };
 
   const handleProgressChange = async (task) => {
@@ -339,8 +357,14 @@ function GanttChart() {
   const postTask = (state) => {
     console.log(state);
     setTasks([...tasks, formatNewDate(state)]);
+
+    const headers = {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${user.token}`,
+    };
+
     axios
-      .post('http://localhost:5000/api/tasks', state)
+      .post('http://localhost:5000/api/tasks', state, { headers })
       .then((res) => {
         console.log(res.data);
       })
@@ -387,11 +411,11 @@ function GanttChart() {
             Add Task
           </Button>
         </span>
-        <span>
-          <span>
-            <span style={{ width: '150px', fontWeight: 'bold' }}>
+        <span style={{position:'absolute'}}>
+          <span style={{marginRight:10}}>
+            <Button style={{ width: '100px', fontWeight: 'bold' }}>
               Assigned To
-            </span>
+            </Button>
           </span>
           {tasks.length > 0 && (
             <Gantt

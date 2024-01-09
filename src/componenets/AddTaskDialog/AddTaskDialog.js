@@ -5,6 +5,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import * as React from 'react';
 import axios from 'axios';
 import { FormControl, InputLabel, MenuItem, Select } from '@mui/material';
+import { useAuthContext } from '../../hooks/useAuthContext';
 
 function AddTaskDialogue(props) {
   const { open, handleClose, handleAddTask, setModal, postTask, tasks } = props;
@@ -19,6 +20,8 @@ const [state, setState] = React.useState({
     dependencies: '',
   });
 
+  const {user} = useAuthContext();
+
   const close = () => {
     // handleClose();
     setModal(false)
@@ -32,6 +35,11 @@ const [state, setState] = React.useState({
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    if (!user) {
+      setError('You must be logged in');
+      return;
+    }
     console.log(state);
     if (state.progress < 0 || state.progress > 100) {
       alert('Progress must be between 0 and 100.');

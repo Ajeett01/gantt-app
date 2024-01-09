@@ -3,6 +3,7 @@ import GanttChart from './Gantt1';
 import LoginPage from './Login';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import Register from './Login';
+import Navbar from './componenets/Navbar';
 
 const App = () => {
 
@@ -10,10 +11,14 @@ const App = () => {
   return (
     <div>
       <Router>
-        <Routes>
-          <Route path="/" element={<Register />} />
-          <Route path="/gantt" element={<GanttChart />} />
-        </Routes>
+        <Navbar />
+        <div className="pages">
+          <Routes>
+            <Route path="/gantt" element={<GanttChart />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+          </Routes>
+        </div>
       </Router>
     </div>
   );
